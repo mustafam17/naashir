@@ -1,4 +1,5 @@
-from classes.YouTubeHandler import YouTubeHandler
+from classes.Office365Client import Office365Client
+from classes.YouTubeHandler import YouTubeHandler, OutputType
 from classes.FileManager import FileManager
 from classes.InputHandler import InputHandler
 
@@ -7,6 +8,9 @@ def main():
     file_manager = FileManager()
 
     try:
+        office365_client = Office365Client()
+        office365_client.get_notebooks()
+
         input_handler = InputHandler()
 
         input_handler.get_valid_youtube_url()
@@ -16,7 +20,9 @@ def main():
             print(f"Temporary directory created: {temp_dir}")
 
             youtube_handler = YouTubeHandler(f"{temp_dir}/full_audio")
-            mp3_path = youtube_handler.download_as_mp3(input_handler.youtube_url_input)
+            mp3_path = youtube_handler.download_video(
+                input_handler.youtube_url_input, OutputType.MP3
+            )
 
             print(f"MP3 file downloaded: {mp3_path}")
 

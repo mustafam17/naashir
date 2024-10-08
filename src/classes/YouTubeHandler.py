@@ -3,8 +3,13 @@ import os
 import shutil
 from pathlib import Path
 from pydantic import HttpUrl
+from enum import Enum
 
-from config.config import FFMPEG_PATH
+from config.environment import FFMPEG_PATH
+
+
+class OutputType(Enum):
+    MP3 = "mp3"
 
 
 class YouTubeHandler:
@@ -17,7 +22,7 @@ class YouTubeHandler:
         os.makedirs(self.output_dir)
 
     def _check_ffmpeg_installed(self):
-        """Check if the FFmpeg path from Config exists."""
+        """Check if FFmpeg exists."""
         ffmpeg_path = Path(FFMPEG_PATH)
         if ffmpeg_path.is_file() or shutil.which(FFMPEG_PATH):
             return True
@@ -25,7 +30,7 @@ class YouTubeHandler:
             print(f"FFmpeg not found at {FFMPEG_PATH}.")
             return False
 
-    def download_as_mp3(self, youtube_url: HttpUrl):
+    def download_video(self, youtube_url: HttpUrl, output_type: OutputType):
         if not self._check_ffmpeg_installed():
             raise RuntimeError(
                 "FFmpeg is not installed. Please install FFmpeg and add it to PATH to proceed."
@@ -34,7 +39,7 @@ class YouTubeHandler:
         ydl_options = {
             "format": "bestaudio/best",
             "extractaudio": True,
-            "audioformat": "mp3",
+            "audioformat": output_type,
             "outtmpl": str(self.output_dir / "%(title)s.%(ext)s"),
             "ffmpeg_location": str(FFMPEG_PATH),
             "postprocessors": [
